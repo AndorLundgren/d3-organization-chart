@@ -23,6 +23,7 @@ class TreeChart {
             dropShadowId: null,
             initialZoom: 1,
             onNodeClick: d => d,
+            connectorShape: ['DIAGONAL', 'STRAIGHT'][Math.round(Math.random() * 1)]
         };
 
         this.getChartState = () => attrs;
@@ -554,7 +555,7 @@ class TreeChart {
                     x: x0,
                     y: y0
                 };
-                return this.diagonal(o, o)
+                return this.linkLine(o, o)
             });
 
         // Get links update selection
@@ -586,7 +587,7 @@ class TreeChart {
         // Transition back to the parent element position
         linkUpdate.transition()
             .duration(attrs.duration)
-            .attr('d', d => this.diagonal(d, d.parent));
+            .attr('d', d => this.linkLine(d, d.parent));
 
         // Remove any  links which is exiting after animation
         const linkExit = linkSelection.exit().transition()
@@ -596,7 +597,7 @@ class TreeChart {
                     x: x,
                     y: y
                 };
-                return this.diagonal(o, o)
+                return this.linkLine(o, o)
             })
             .remove();
 
@@ -947,6 +948,35 @@ class TreeChart {
         alpha
     }) {
         return `rgba(${red},${green},${blue},${alpha})`;
+    }
+
+    linkLine(s,t) {
+        const attrs = this.getChartState();
+
+        if(attrs.connectorShape == 'STRAIGHT'){
+            return this.straight(s,t);        
+        }
+        else {
+            return this.diagonal(s,t);
+        }
+    }
+
+    straight(s, t) {
+        const x = s.x;
+        const y = s.y;
+        const ex = t.x;
+        const ey = t.y;
+
+        let h = (ey - y) / 2;
+        let w = (ex - x);
+      
+        const path = `
+            M ${x} ${y}
+            L ${x} ${y + h}
+            L ${x + w} ${y + h}
+            L ${ex} ${ey}
+ `
+        return path;
     }
 
     // Generate custom diagonal - play with it here - https://observablehq.com/@bumbeishvili/curved-edges?collection=@bumbeishvili/work-components
