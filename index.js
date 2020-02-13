@@ -195,11 +195,13 @@ class TreeChart {
             })
         })
 
-        // Collapse all children at first
-        attrs.root.children.forEach(d => this.collapse(d));
+        if(attrs.root.children){
+            // Collapse all children at first
+            attrs.root.children.forEach(d => this.collapse(d));
 
-        // Then expand some nodes, which have `expanded` property set
-        attrs.root.children.forEach(d => this.expandSomeNodes(d));
+            // Then expand some nodes, which have `expanded` property set
+            attrs.root.children.forEach(d => this.expandSomeNodes(d));
+        }
 
         // *************************  DRAWING **************************
         //Add svg
@@ -1069,14 +1071,16 @@ class TreeChart {
         // If node exists, set expansion flag
         if (node) node.data.expanded = expandedFlag;
 
-        // First expand all nodes
-        attrs.root.children.forEach(d => this.expand(d));
+        if(attrs.root.children){
+            // First expand all nodes
+            attrs.root.children.forEach(d => this.expand(d));
 
-        // Then collapse all nodes
-        attrs.root.children.forEach(d => this.collapse(d));
+            // Then collapse all nodes
+            attrs.root.children.forEach(d => this.collapse(d));
 
-        // Then expand only the nodes, which were previously expanded, or have an expand flag set
-        attrs.root.children.forEach(d => this.expandSomeNodes(d));
+            // Then expand only the nodes, which were previously expanded, or have an expand flag set
+            attrs.root.children.forEach(d => this.expandSomeNodes(d));
+        }
 
         // Redraw graph
         this.update(attrs.root);
@@ -1144,14 +1148,16 @@ class TreeChart {
             })
         })
 
-        // Expand all nodes first
-        attrs.root.children.forEach(this.expand);
+        if(attrs.root.children){
+            // Expand all nodes first
+            attrs.root.children.forEach(this.expand);
 
-        // Then collapse them all
-        attrs.root.children.forEach(d => this.collapse(d));
+            // Then collapse them all
+            attrs.root.children.forEach(d => this.collapse(d));
 
-        // Then only expand nodes, which have expanded proprty set to true
-        attrs.root.children.forEach(ch => this.expandSomeNodes(ch));
+            // Then only expand nodes, which have expanded proprty set to true
+            attrs.root.children.forEach(ch => this.expandSomeNodes(ch));
+        }
 
         // Redraw Graphs
         this.update(attrs.root)
