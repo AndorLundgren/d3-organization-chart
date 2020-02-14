@@ -895,7 +895,7 @@ class TreeChart {
                 if (children) return '-';
                 return '+';
             })
-            .attr('y', this.isEdge() ? 10 : 0)
+            .attr('y', ({ children }) => this.isEdge() ? 10 : children ? -3 : 0)
 
         // Remove any exiting nodes after transition
         const nodeExitTransition = nodesSelection.exit()
