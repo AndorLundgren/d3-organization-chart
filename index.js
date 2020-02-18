@@ -23,9 +23,19 @@ class TreeChart {
             dropShadowId: null,
             initialZoom: 1,
             onNodeClick: d => d,
-            connectorShape: ['DIAGONAL', 'STRAIGHT'][Math.round(Math.random() * 1)]
+            connectorShape: ['DIAGONAL', 'STRAIGHT'][Math.round(Math.random() * 1)],
+            descendantsOptions: {
+                directLabel: 'Direct',
+                directPos: { x:0, y: 0 },
+                joinedLabel: 'Children',
+                joinedPos: {x: 0, y: 0},
+                showDirectNum: true,
+                showJoined: false,
+                showSubordinatesNum: true,
+                subordinatesLabel: 'Subordinates',
+                subordinatesPos: { x: 0, y: 0 }
+            }
         };
-
         this.getChartState = () => attrs;
 
         // Dinamically set getter and setter functions for Chart class
@@ -659,47 +669,83 @@ class TreeChart {
                 data
             }) => height / 2 - data.nodeIcon.size - 5)
 
-        // Add total descendants text
-        nodeEnter
-            .patternify({
-                tag: 'text',
-                selector: 'node-icon-text-total',
-                data: d => [d]
-            })
-            .text('test')
-            .attr('x', ({
-                width
-            }) => -width / 2 + 7)
-            .attr('y', ({
-                height,
-                data
-            }) => height / 2 - data.nodeIcon.size - 5)
-            .text(({
-                data
-            }) => `${data.totalSubordinates} Subordinates`)
-            .attr('fill', attrs.nodeTextFill)
-            .attr('font-weight', 'bold')
+        if (attrs.descendantsOptions.showJoined === true) {
+            nodeEnter
+                    .patternify({
+                        tag: 'text',
+                        selector: 'node-icon-text-children',
+                        data: d => [d]
+                    })
+                    .text('test')
+                    .attr('x', ({
+                        width
+                    }) => width / 2 - 4 + attrs.descendantsOptions.joinedPos.x)
+                    .attr('text-anchor', 'end')
+                    .attr('y', ({
+                        height,
+                        data
+                    }) => height / 2 - 6 + attrs.descendantsOptions.joinedPos.y)
+                    .text(({
+                        data
+                    }) => {
+                        if(data.totalSubordinates > 0){
+                            let mergedText = data.totalSubordinates > data.directSubordinates ?
+                                `${attrs.descendantsOptions.joinedLabel} (${data.directSubordinates}/${data.totalSubordinates})` :
+                                `${attrs.descendantsOptions.joinedLabel} ${data.directSubordinates}`
+                            return mergedText
+                        }
+                    }
+                    )
+                    .attr('fill', attrs.nodeTextFill)
+                    .attr('font-weight', 'bold')
+        }
+        else{
+            // Add total descendants text (modified using code from https://github.com/rhodief/d3-organization-chart/)
+            if (attrs.descendantsOptions.showSubordinatesNum !== false) {
+                nodeEnter
+                    .patternify({
+                        tag: 'text',
+                        selector: 'node-icon-text-total',
+                        data: d => [d]
+                    })
+                    .text('test')
+                    .attr('x', ({
+                        width
+                    }) => -width / 2 + 7 + attrs.descendantsOptions.subordinatesPos.x)
+                    .attr('y', ({
+                        height,
+                        data
+                    }) => height / 2 - data.nodeIcon.size + attrs.descendantsOptions.subordinatesPos.y)
+                    .text(({
+                        data
+                    }) => `${data.totalSubordinates} ${attrs.descendantsOptions.subordinatesLabel || 'Subordinates'} `)
+                    .attr('fill', attrs.nodeTextFill)
+                    .attr('font-weight', 'bold')
+            }
 
-        // Add direct descendants text
-        nodeEnter
-            .patternify({
-                tag: 'text',
-                selector: 'node-icon-text-direct',
-                data: d => [d]
-            })
-            .text('test')
-            .attr('x', ({
-                width,
-                data
-            }) => -width / 2 + 10 + data.nodeIcon.size)
-            .attr('y', ({
-                height
-            }) => height / 2 - 10)
-            .text(({
-                data
-            }) => `${data.directSubordinates} Direct `)
-            .attr('fill', attrs.nodeTextFill)
-            .attr('font-weight', 'bold')
+            // Add direct descendants text (modified using code from https://github.com/rhodief/d3-organization-chart/)
+            if (attrs.descendantsOptions.showDirectNum !== false) {
+                nodeEnter
+                    .patternify({
+                        tag: 'text',
+                        selector: 'node-icon-text-direct',
+                        data: d => [d]
+                    })
+                    .text('test')
+                    .attr('x', ({
+                        width,
+                        data
+                    }) => -width / 2 + 10 + data.nodeIcon.size + attrs.descendantsOptions.directPos.x)
+                    .attr('y', ({
+                        height
+                    }) => height / 2 - 10 + attrs.descendantsOptions.directPos.y)
+                    .text(({
+                        data
+                    }) => `${data.directSubordinates} ${attrs.descendantsOptions.directLabel || 'Direct'} `)
+                    .attr('fill', attrs.nodeTextFill)
+                    .attr('font-weight', 'bold')
+            }
+        }
 
 
         // Defined node images wrapper group
